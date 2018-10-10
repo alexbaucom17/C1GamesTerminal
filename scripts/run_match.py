@@ -27,7 +27,8 @@ print("Is windows: {}".format(is_windows))
 
 # Set default path for algos if script is run with no params
 default_algo = parent_dir + "\\algos\\starter-algo-ZIPME\\run.ps1" if is_windows else parent_dir + "/algos/starter-algo-ZIPME/run.sh" 
-algo1 = default_algo
+custom_algo  = parent_dir + "\\algos\\my-algo-v1\\run.ps1" if is_windows else parent_dir + "/algos/my-algo-v1/run.sh" 
+algo1 = custom_algo
 algo2 = default_algo
 
 # If script run with params, use those algo locations when running the game
