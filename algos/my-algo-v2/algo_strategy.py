@@ -245,14 +245,18 @@ class AlgoStrategy(gamelib.AlgoCore):
         
         # Dumb strategy for now, just testing to see if it works
         self.protect_corners(game_state)
-        self.build_wall(game_state)
-        self.reinforce_wall(game_state)
+        self.build_wall(game_state,'evens')
+        self.reinforce_wall(game_state,'odds')
+        self.build_wall(game_state,'odds')
+        self.reinforce_wall(game_state,'evens')
+        self.boost_attackers(game_state)
         
         if game_state.turn_number % 2 == 0:
             self.EMP_blast(game_state)
         else:
             self.brute_force_pings(game_state,'left')
-
+            
+        
         # Clean up 
         self.scoring_locations = {'me': [], 'enemy':[]}
         
@@ -266,31 +270,39 @@ class AlgoStrategy(gamelib.AlgoCore):
         return (quad_strength, quad_danger)
         
 
-    def build_wall(self, game_state):
+    def build_wall(self, game_state, evens_or_odds=''):
         """
         Build a wall of filters near the front as the first line of protection
         """
 
-        y = 12
-        x = [ i for i in range(1,27)]
+        y = 11
+        x = [ i for i in range(3,25) if i not in [13,14]]
         wall_units = FILTER
         
         wall_locations = [(i,y) for i in x]
+        if evens_or_odds:
+            if evens_or_odds == 'evens':
+                wall_locations = wall_locations[1::2]
+            else:
+                wall_locations = wall_locations[0::2]
+        
         self.build_as_many_as_possible(game_state, wall_units, wall_locations)
         
-    def reinforce_wall(self,game_state):
+    def reinforce_wall(self,game_state,evens_or_odds=''):
         """
         Put a row of destructors behind the wall to kill units
         """
         
-        y = 11
-        x1 = [ i for i in range(2,28,2)]
-        x2 = [ i for i in range(3,27,2)]
-        x = x1 + x2
+        y = 10
+        x = [ i for i in range(3,25) if i not in [13,14]]
         wall_units = DESTRUCTOR
         
         wall_locations = [(i,y) for i in x]
-
+        if evens_or_odds:
+            if evens_or_odds == 'evens':
+                wall_locations = wall_locations[1::2]
+            else:
+                wall_locations = wall_locations[0::2]
         self.build_as_many_as_possible(game_state, wall_units, wall_locations)
         
         
@@ -298,11 +310,27 @@ class AlgoStrategy(gamelib.AlgoCore):
         """
         Add more defenses to the corners where we may be weak
         """
-
+        
+        # First add some filters
+        wall_units = FILTER
+        wall_locations = [[0,13],[27,13],[1,13],[2,12],[25,12],[26,13]]
+        
+        if left_or_right:
+            if left_or_right == 'left':
+                wall_locations = wall_locations[0:2]
+            else:
+                wall_locations = wall_locations[2:4]
+        self.build_as_many_as_possible(game_state, wall_units, wall_locations)
+        
         # Then add some destructors
         wall_units = DESTRUCTOR
-        wall_locations = [[0,13],[27,13]]
+        wall_locations = [[1,12],[2,11],[25,11],[26,12]]
         
+        if left_or_right:
+            if left_or_right == 'left':
+                wall_locations = wall_locations[0:2]
+            else:
+                wall_locations = wall_locations[2:4]
         self.build_as_many_as_possible(game_state, wall_units, wall_locations)
         
         

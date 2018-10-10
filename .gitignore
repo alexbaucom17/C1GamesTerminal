@@ -1,6 +1,7 @@
 *.DS_Store*
 *.replay
 *__pycache__*
+*.idea
 
 dist/*
 !dist/.gitkeep
